@@ -53,7 +53,7 @@
 
                 _logger.Info($"account:{accountId}, failedCount{_failedCounter.Get(accountId)}");
 
-                _notification.SlackAdapter();
+                _notification.PushMessage($"account:{accountId}, AuthFailed");
 
                 return false;
             }

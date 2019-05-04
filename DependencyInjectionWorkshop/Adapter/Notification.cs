@@ -4,15 +4,15 @@
 
     public interface INotification
     {
-        void SlackAdapter();
+        void PushMessage(string message);
     }
 
     public class Notification : INotification
     {
-        public void SlackAdapter()
+        public void PushMessage(string message)
         {
             var slackClient = new SlackClient("my api token");
-            slackClient.PostMessage(slackResponse => { }, "my channel", "my message", "my bot name");
+            slackClient.PostMessage(r => { }, "my channel", message, "my bot name");
         }
     }
 }

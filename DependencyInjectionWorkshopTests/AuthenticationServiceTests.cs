@@ -34,6 +34,8 @@ namespace DependencyInjectionWorkshopTests
 
         private const string DefaultPassword = "pw";
 
+        private const int DefaultFailedCount = 91;
+
         [SetUp]
         public void Setup()
         {
@@ -63,6 +65,64 @@ namespace DependencyInjectionWorkshopTests
             var isValid = WhenVerify(DefaultAccountId, DefaultPassword, DefaultOtp);
 
             ShouldBeValid(isValid);
+        }
+
+        [Test]
+        public void is_invalid_when_wrong_otp()
+        {
+            GivenPassword(DefaultAccountId, DefaultHashedPassword);
+            GivenHash(DefaultPassword, DefaultHashedPassword);
+            GivenOtp(DefaultAccountId, DefaultOtp);
+
+            var isValid = WhenVerify(DefaultAccountId, DefaultPassword, "wrong otp");
+
+            ShouldBeInvalid(isValid);
+        }
+
+        [Test]
+        public void notify_user_when_invalid()
+        {
+            WhenInvalid();
+            ShouldNotifyUser();
+        }
+
+        private void ShouldNotifyUser()
+        {
+            _notification.Received(1).PushMessage(Arg.Any<string>());
+        }
+
+        private bool WhenInvalid()
+        {
+            GivenPassword(DefaultAccountId, DefaultHashedPassword);
+            GivenHash(DefaultPassword, DefaultHashedPassword);
+            GivenOtp(DefaultAccountId, DefaultOtp);
+
+            return WhenVerify(DefaultAccountId, DefaultPassword, "wrong otp");
+        }
+
+        [Test]
+        public void Log_account_failed_count_when_invalid()
+        {
+            GivenFailedCount(DefaultFailedCount);
+
+            WhenInvalid();
+
+            LogShouldContains(DefaultAccountId, DefaultFailedCount);
+        }
+
+        private void LogShouldContains(string accountId, int failedCount)
+        {
+            _logger.Received(1).Info(Arg.Is<string>(m => m.Contains(accountId) && m.Contains(failedCount.ToString())));
+        }
+
+        private void GivenFailedCount(int failedCount)
+        {
+            _failedCounter.Get(DefaultAccountId).ReturnsForAnyArgs(failedCount);
+        }
+
+        private static void ShouldBeInvalid(bool isValid)
+        {
+            Assert.IsFalse(isValid);
         }
 
         private static void ShouldBeValid(bool isValid)
