@@ -4,40 +4,6 @@
     using DependencyInjectionWorkshop.Repo;
     using DependencyInjectionWorkshop.Service;
 
-    public interface IAuthentication
-    {
-        bool Verify(string accountId, string password, string otp);
-    }
-
-    public class NotificationDecorator : IAuthentication
-    {
-        private readonly IAuthentication _authentication;
-
-        private readonly INotification _notification;
-
-        public NotificationDecorator(IAuthentication authentication, INotification notification)
-        {
-            _authentication = authentication;
-            _notification = notification;
-        }
-
-        private void NotificationVerify(string accountId)
-        {
-            _notification.PushMessage($"account:{accountId}, AuthFailed!");
-        }
-
-        public bool Verify(string accountId, string password, string otp)
-        {
-            var isValid = _authentication.Verify(accountId, password, otp);
-            if (!isValid)
-            {
-                NotificationVerify(accountId);
-            }
-
-            return isValid;
-        }
-    }
-
     public class AuthenticationService : IAuthentication
     {
         private readonly IProfile _profile;

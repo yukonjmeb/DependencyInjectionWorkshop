@@ -1,5 +1,6 @@
 ﻿namespace DependencyInjectionWorkshopTests
 {
+    using DependencyInjectionWorkshop.Decorator;
     using DependencyInjectionWorkshop.Exceptions;
     using DependencyInjectionWorkshop.Models;
     using DependencyInjectionWorkshop.Repo;
