@@ -15,6 +15,8 @@
     {
         public bool Verify(string accountId, string password, string otp)
         {
+            var logger = NLog.LogManager.GetCurrentClassLogger();
+
             var httpClient = new HttpClient() { BaseAddress = new Uri("http://joey.com/") };
             var isLockedResponse = httpClient.PostAsJsonAsync("api/failedCounter/IsLocked", accountId).Result;
             isLockedResponse.EnsureSuccessStatusCode();
@@ -60,8 +62,15 @@
             }
             else
             {
-                var addFailedCountResponse = httpClient.PostAsJsonAsync("api/failedCounter/ReSet", accountId).Result;
+                var addFailedCountResponse = httpClient.PostAsJsonAsync("api/failedCounter/Add", accountId).Result;
                 addFailedCountResponse.EnsureSuccessStatusCode();
+
+                var failedCountResponse =
+                    httpClient.PostAsJsonAsync("api/failedCounter/GetFailedCount", accountId).Result;
+                addFailedCountResponse.EnsureSuccessStatusCode();
+
+                logger.Info($"log content, failedCount:{failedCountResponse.Content.ReadAsAsync<int>().Result}");
+
                 var slackClient = new SlackClient("my api token");
                 slackClient.PostMessage(slackResponse => { }, "my channel", "my message", "my bot name");
 
