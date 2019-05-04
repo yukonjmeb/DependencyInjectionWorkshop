@@ -54,6 +54,7 @@
             {
                 throw new Exception($"web api error, accountId:{accountId}");
             }
+
             if (DBPassword == HashPassword && CurrentOTP == otp)
             {
                 var resetResponse = httpClient.PostAsJsonAsync("api/failedCounter/ReSet", accountId).Result;
@@ -69,7 +70,7 @@
                     httpClient.PostAsJsonAsync("api/failedCounter/GetFailedCount", accountId).Result;
                 addFailedCountResponse.EnsureSuccessStatusCode();
 
-                logger.Info($"log content, failedCount:{failedCountResponse.Content.ReadAsAsync<int>().Result}");
+                logger.Info($"accountid:{accountId}, failedCount:{failedCountResponse.Content.ReadAsAsync<int>().Result}");
 
                 var slackClient = new SlackClient("my api token");
                 slackClient.PostMessage(slackResponse => { }, "my channel", "my message", "my bot name");
