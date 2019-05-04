@@ -18,6 +18,12 @@
             var httpClient = new HttpClient() { BaseAddress = new Uri("http://joey.com/") };
             var isLockedResponse = httpClient.PostAsJsonAsync("api/failedCounter/IsLocked", accountId).Result;
             isLockedResponse.EnsureSuccessStatusCode();
+
+            if (!isLockedResponse.Content.ReadAsAsync<bool>().Result)
+            {
+                throw new FailedTooManyTimesException();
+            }
+
             var DBPassword = string.Empty;
             var CurrentOTP = string.Empty;
 
@@ -46,7 +52,6 @@
             {
                 throw new Exception($"web api error, accountId:{accountId}");
             }
-
             if (DBPassword == HashPassword && CurrentOTP == otp)
             {
                 var resetResponse = httpClient.PostAsJsonAsync("api/failedCounter/ReSet", accountId).Result;
@@ -62,6 +67,13 @@
 
                 return false;
             }
+        }
+    }
+
+    public class FailedTooManyTimesException : Exception
+    {
+        public FailedTooManyTimesException()
+        {
         }
     }
 }
