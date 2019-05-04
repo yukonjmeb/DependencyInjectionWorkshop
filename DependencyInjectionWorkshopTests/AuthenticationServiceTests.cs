@@ -1,14 +1,13 @@
-﻿using DependencyInjectionWorkshop.Models;
-
-using NUnit.Framework;
-
-namespace DependencyInjectionWorkshopTests
+﻿namespace DependencyInjectionWorkshopTests
 {
     using DependencyInjectionWorkshop.Exceptions;
+    using DependencyInjectionWorkshop.Models;
     using DependencyInjectionWorkshop.Repo;
     using DependencyInjectionWorkshop.Service;
 
     using NSubstitute;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class AuthenticationServiceTests
@@ -25,7 +24,7 @@ namespace DependencyInjectionWorkshopTests
 
         private ILogger _logger;
 
-        private AuthenticationService _authenticationService;
+        private IAuthentication _authentication;
 
         private const string DefaultAccountId = "joey";
 
@@ -47,13 +46,9 @@ namespace DependencyInjectionWorkshopTests
             _failedCounter = Substitute.For<IFailedCounter>();
             _logger = Substitute.For<ILogger>();
 
-            _authenticationService = new AuthenticationService(
-                _profile,
-                _failedCounter,
-                _hash,
-                _otp,
-                _logger,
-                _notification);
+            var authenticationService = new AuthenticationService(_profile, _failedCounter, _hash, _otp, _logger);
+
+            _authentication = new NotificationDecorator(authenticationService, _notification);
         }
 
         [Test]
@@ -145,7 +140,7 @@ namespace DependencyInjectionWorkshopTests
         {
             _failedCounter.CheckAccountIsLocked(DefaultAccountId).ReturnsForAnyArgs(true);
 
-            TestDelegate action = () => _authenticationService.Verify(DefaultAccountId, DefaultPassword, DefaultOtp);
+            TestDelegate action = () => _authentication.Verify(DefaultAccountId, DefaultPassword, DefaultOtp);
             Assert.Throws<FailedTooManyTimesException>(action);
         }
 
@@ -176,7 +171,7 @@ namespace DependencyInjectionWorkshopTests
 
         private bool WhenVerify(string accountId, string password, string otp)
         {
-            return _authenticationService.Verify(accountId, password, otp);
+            return _authentication.Verify(accountId, password, otp);
         }
 
         private void GivenHash(string password, string hash)

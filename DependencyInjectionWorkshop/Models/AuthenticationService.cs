@@ -4,33 +4,55 @@
     using DependencyInjectionWorkshop.Repo;
     using DependencyInjectionWorkshop.Service;
 
-    public class AuthenticationService
+    public interface IAuthentication
+    {
+        bool Verify(string accountId, string password, string otp);
+    }
+
+    public class NotificationDecorator : IAuthentication
+    {
+        private readonly IAuthentication _authentication;
+
+        private readonly INotification _notification;
+
+        public NotificationDecorator(IAuthentication authentication, INotification notification)
+        {
+            _authentication = authentication;
+            _notification = notification;
+        }
+
+        private void NotificationVerify(string accountId)
+        {
+            _notification.PushMessage($"account:{accountId}, AuthFailed!");
+        }
+
+        public bool Verify(string accountId, string password, string otp)
+        {
+            var isValid = _authentication.Verify(accountId, password, otp);
+            if (!isValid)
+            {
+                NotificationVerify(accountId);
+            }
+
+            return isValid;
+        }
+    }
+
+    public class AuthenticationService : IAuthentication
     {
         private readonly IProfile _profile;
         private readonly IFailedCounter _failedCounter;
         private readonly IHash _hash;
         private readonly IOTP _otp;
         private readonly ILogger _logger;
-        private readonly INotification _notification;
 
-        public AuthenticationService(IProfile profile, IFailedCounter failedCounter, IHash hash, IOTP otp, ILogger logger, INotification notification)
+        public AuthenticationService(IProfile profile, IFailedCounter failedCounter, IHash hash, IOTP otp, ILogger logger)
         {
             _profile = profile;
             _failedCounter = failedCounter;
             _hash = hash;
             _otp = otp;
             _logger = logger;
-            _notification = notification;
-        }
-
-        public AuthenticationService()
-        {
-            _profile = new Profile();
-            _failedCounter = new FailedCounter();
-            _hash = new Hash();
-            _otp = new OTP();
-            _logger = new NLogAdapter();
-            _notification = new Notification();
         }
 
         public bool Verify(string accountId, string password, string otp)
@@ -55,9 +77,7 @@
             {
                 _failedCounter.Add(accountId);
 
-                _logger.Info($"account:{accountId}, failedCount{_failedCounter.Get(accountId)}");
-
-                _notification.PushMessage($"account:{accountId}, AuthFailed");
+                _logger.Info($"account:{accountId}, failedCount:{_failedCounter.Get(accountId)}");
 
                 return false;
             }

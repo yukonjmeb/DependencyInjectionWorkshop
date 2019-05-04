@@ -7,7 +7,7 @@
         void PushMessage(string message);
     }
 
-    public class Notification : INotification
+    public class SlackAdapter : INotification
     {
         public void PushMessage(string message)
         {
