@@ -23,9 +23,9 @@
 
             var hashPassword = _hash.GetHash(password);
 
-            var currentOTP = _otp.GetCurrentOTP(accountId);
+            var currentOtp = _otp.GetCurrentOtp(accountId);
 
-            return passwordFromDB == hashPassword && currentOTP == otp;
+            return passwordFromDB == hashPassword && currentOtp == otp;
         }
     }
 }

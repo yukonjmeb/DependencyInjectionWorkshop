@@ -14,6 +14,7 @@
             _logger = logger;
             _failedCounter = failedCounter;
         }
+
         private void LogVerify(string accountId)
         {
             var failedCount = _failedCounter.Get(accountId);

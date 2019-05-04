@@ -191,7 +191,7 @@
 
         private void GivenOtp(string accountId, string otp)
         {
-            _otp.GetCurrentOTP(accountId).ReturnsForAnyArgs(otp);
+            _otp.GetCurrentOtp(accountId).ReturnsForAnyArgs(otp);
         }
     }
 }

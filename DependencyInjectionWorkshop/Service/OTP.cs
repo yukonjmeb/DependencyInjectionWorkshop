@@ -5,12 +5,12 @@
 
     public interface IOtp
     {
-        string GetCurrentOTP(string accountId);
+        string GetCurrentOtp(string accountId);
     }
 
-    public class OTP : IOtp
+    public class Otp : IOtp
     {
-        public string GetCurrentOTP(string accountId)
+        public string GetCurrentOtp(string accountId)
         {
             string CurrentOTP;
             var response = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/otps", accountId).Result;
