@@ -9,9 +9,10 @@
 
     using Dapper;
 
+    using SlackAPI;
+
     public class AuthenticationService
     {
-
         public bool Verify(string accountId, string password, string otp)
         {
             var DBPassword = string.Empty;
@@ -44,7 +45,17 @@
                 throw new Exception($"web api error, accountId:{accountId}");
             }
 
-            return (DBPassword == HashPassword && CurrentOTP == otp);
+            if (DBPassword == HashPassword && CurrentOTP == otp)
+            {
+                return true;
+            }
+            else
+            {
+                var slackClient = new SlackClient("my api token");
+                slackClient.PostMessage(slackResponse => { }, "my channel", "my message", "my bot name");
+
+                return false;
+            }
         }
     }
 }
