@@ -28,7 +28,7 @@
             _failedCounter = new FailedCounter();
             _hash = new Hash();
             _otp = new OTP();
-            _logger = new Logger();
+            _logger = new NLogAdapter();
             _notification = new Notification();
         }
 
@@ -51,9 +51,7 @@
             {
                 _failedCounter.Add(accountId);
 
-                var failedCountResponse = _failedCounter.Get(accountId);
-
-                _logger.Info(accountId, failedCountResponse);
+                _logger.Info($"account:{accountId}, failedCount{_failedCounter.Get(accountId)}");
 
                 _notification.SlackAdapter();
 

@@ -7,18 +7,17 @@
 
     public class FailedCounter : IFailedCounter
     {
-        public HttpResponseMessage Add(string accountId)
+        public void Add(string accountId)
         {
             var addFailedCountResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/Add", accountId).Result;
             addFailedCountResponse.EnsureSuccessStatusCode();
-            return addFailedCountResponse;
         }
 
-        public HttpResponseMessage Get(string accountId)
+        public int Get(string accountId)
         {
             var failedCountResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/Get", accountId).Result;
             failedCountResponse.EnsureSuccessStatusCode();
-            return failedCountResponse;
+            return failedCountResponse.Content.ReadAsAsync<int>().Result;
         }
 
         public void Reset(string accountId)

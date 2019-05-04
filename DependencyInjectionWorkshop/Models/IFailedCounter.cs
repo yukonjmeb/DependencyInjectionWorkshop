@@ -4,9 +4,9 @@
 
     public interface IFailedCounter
     {
-        HttpResponseMessage Add(string accountId);
+        void Add(string accountId);
 
-        HttpResponseMessage Get(string accountId);
+        int Get(string accountId);
 
         void Reset(string accountId);
 

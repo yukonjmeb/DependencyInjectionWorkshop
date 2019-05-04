@@ -78,7 +78,7 @@
     <Compile Include="Exceptions\FailedTooManyTimesException.cs" />
     <Compile Include="Models\AuthenticationService.cs" />
     <Compile Include="Models\FailedCounter.cs" />
-    <Compile Include="Adapter\Logger.cs" />
+    <Compile Include="Adapter\NLogAdapter.cs" />
     <Compile Include="Adapter\Hash.cs" />
     <Compile Include="Adapter\Notification.cs" />
     <Compile Include="Models\IFailedCounter.cs" />
