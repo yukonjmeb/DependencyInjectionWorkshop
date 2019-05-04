@@ -6,9 +6,14 @@
 
     using Dapper;
 
-    public class ProfileRepo
+    public interface IProfile
     {
-        public string GetPasswordFromDB(string accountId)
+        string GetPassword(string accountId);
+    }
+
+    public class Profile : IProfile
+    {
+        public string GetPassword(string accountId)
         {
             using (var connection = new SqlConnection("my connection string"))
             {

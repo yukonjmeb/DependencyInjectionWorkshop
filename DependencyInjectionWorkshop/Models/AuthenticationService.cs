@@ -5,18 +5,39 @@
 
     public class AuthenticationService
     {
-        private readonly ProfileRepo _profileRepo = new ProfileRepo();
-        private readonly SHA256Adapter _sha256Adapter = new SHA256Adapter();
-        private readonly OtpService _otpService = new OtpService();
-        private readonly FailedCounter _failedCounter = new FailedCounter();
-        private readonly NLogAdapter _nLogAdapter = new NLogAdapter();
-        private readonly SlackAdapter _slackAdapter = new SlackAdapter();
+        private readonly IProfile _profile;
+        private readonly FailedCounter _failedCounter;
+        private readonly SHA256Adapter _sha256Adapter;
+        private readonly OtpService _otpService;
+        private readonly NLogAdapter _nLogAdapter;
+        private readonly SlackAdapter _slackAdapter;
+
+        public AuthenticationService(IProfile profile, FailedCounter failedCounter, SHA256Adapter sha256Adapter, OtpService otpService, NLogAdapter nLogAdapter, SlackAdapter slackAdapter)
+        {
+            _profile = profile;
+            _failedCounter = failedCounter;
+            _sha256Adapter = sha256Adapter;
+            _otpService = otpService;
+            _nLogAdapter = nLogAdapter;
+            _slackAdapter = slackAdapter;
+        }
+
+        public AuthenticationService()
+        {
+            _profile = new Profile();
+            _failedCounter = new FailedCounter();
+            _sha256Adapter = new SHA256Adapter();
+            _otpService = new OtpService();
+            _nLogAdapter = new NLogAdapter();
+            _slackAdapter = new SlackAdapter();
+        }
 
         public bool Verify(string accountId, string password, string otp)
         {
-            _failedCounter.CheckAccountIsLocked(accountId);
+            var failedCounter = _failedCounter;
+            failedCounter.CheckAccountIsLocked(accountId);
 
-            var passwordFromDB = _profileRepo.GetPasswordFromDB(accountId);
+            var passwordFromDB = _profile.GetPassword(accountId);
 
             var hashPassword = _sha256Adapter.GetHashPassword(password);
 
@@ -24,14 +45,14 @@
 
             if (passwordFromDB == hashPassword && currentOTP == otp)
             {
-                _failedCounter.ResetFailedCounter(accountId);
+                failedCounter.ResetFailedCounter(accountId);
                 return true;
             }
             else
             {
-                _failedCounter.AddFailedCount(accountId);
+                failedCounter.AddFailedCount(accountId);
 
-                var failedCountResponse = _failedCounter.FailedCount(accountId);
+                var failedCountResponse = failedCounter.FailedCount(accountId);
 
                 _nLogAdapter.LogFailedCount(accountId, failedCountResponse);
 

@@ -82,7 +82,7 @@
     <Compile Include="Adapter\SHA256Adapter.cs" />
     <Compile Include="Adapter\SlackAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repo\ProfileRepo.cs" />
+    <Compile Include="Repo\Profile.cs" />
     <Compile Include="Service\OtpService.cs" />
   </ItemGroup>
   <ItemGroup>
