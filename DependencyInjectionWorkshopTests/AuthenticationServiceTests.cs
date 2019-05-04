@@ -15,7 +15,7 @@
     {
         private IProfile _profile;
 
-        private IOTP _otp;
+        private IOtp _otp;
 
         private IHash _hash;
 
@@ -41,15 +41,19 @@
         public void Setup()
         {
             _profile = Substitute.For<IProfile>();
-            _otp = Substitute.For<IOTP>();
+            _otp = Substitute.For<IOtp>();
             _hash = Substitute.For<IHash>();
             _notification = Substitute.For<INotification>();
             _failedCounter = Substitute.For<IFailedCounter>();
             _logger = Substitute.For<ILogger>();
 
-            var authenticationService = new AuthenticationService(_profile, _failedCounter, _hash, _otp, _logger);
+            var authenticationService = new AuthenticationService(_profile, _hash, _otp);
 
-            _authentication = new NotificationDecorator(authenticationService, _notification);
+            var notificationDecorator = new NotificationDecorator(authenticationService, _notification);
+            var failedCounterDecorator = new FailedCounterDecorator(notificationDecorator, _failedCounter);
+            var logDecorator = new LogDecorator(failedCounterDecorator, _logger, _failedCounter);
+
+            _authentication = logDecorator;
         }
 
         [Test]

@@ -75,6 +75,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Decorator\FailedCounterDecorator.cs" />
+    <Compile Include="Decorator\LogDecorator.cs" />
     <Compile Include="Decorator\NotificationDecorator.cs" />
     <Compile Include="Exceptions\FailedTooManyTimesException.cs" />
     <Compile Include="Models\AuthenticationService.cs" />
