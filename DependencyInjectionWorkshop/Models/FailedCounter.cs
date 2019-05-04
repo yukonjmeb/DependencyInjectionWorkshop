@@ -26,14 +26,15 @@
             resetResponse.EnsureSuccessStatusCode();
         }
 
-        public void CheckAccountIsLocked(string accountId)
+        public bool CheckAccountIsLocked(string accountId)
         {
-            var isLockedResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/IsLocked", accountId).Result;
+            var isLockedResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }
+                .PostAsJsonAsync("api/failedCounter/IsLocked", accountId).Result;
             isLockedResponse.EnsureSuccessStatusCode();
 
-            if (isLockedResponse.Content.ReadAsAsync<bool>().Result)
+            var isLocked = isLockedResponse.Content.ReadAsAsync<bool>().Result;
             {
-                throw new FailedTooManyTimesException();
+                return isLocked;
             }
         }
     }

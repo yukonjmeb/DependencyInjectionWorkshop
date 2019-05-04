@@ -4,6 +4,7 @@ using NUnit.Framework;
 
 namespace DependencyInjectionWorkshopTests
 {
+    using DependencyInjectionWorkshop.Exceptions;
     using DependencyInjectionWorkshop.Repo;
     using DependencyInjectionWorkshop.Service;
 
@@ -91,6 +92,16 @@ namespace DependencyInjectionWorkshopTests
             _notification.Received(1).PushMessage(Arg.Any<string>());
         }
 
+        private bool WhenValid()
+        {
+            GivenPassword(DefaultAccountId, DefaultHashedPassword);
+            GivenHash(DefaultPassword, DefaultHashedPassword);
+            GivenOtp(DefaultAccountId, DefaultOtp);
+
+            var isValid = WhenVerify(DefaultAccountId, DefaultPassword, DefaultOtp);
+            return isValid;
+        }
+
         private bool WhenInvalid()
         {
             GivenPassword(DefaultAccountId, DefaultHashedPassword);
@@ -101,13 +112,46 @@ namespace DependencyInjectionWorkshopTests
         }
 
         [Test]
-        public void Log_account_failed_count_when_invalid()
+        public void log_account_failed_count_when_invalid()
         {
             GivenFailedCount(DefaultFailedCount);
 
             WhenInvalid();
 
             LogShouldContains(DefaultAccountId, DefaultFailedCount);
+        }
+
+        [Test]
+        public void reset_failed_count_when_valid()
+        {
+            WhenValid();
+            ShouldResetFailedCounter();
+        }
+
+        private void ShouldResetFailedCounter()
+        {
+            _failedCounter.Received(1).Reset(Arg.Any<string>());
+        }
+
+        [Test]
+        public void add_failed_count_when_invalid()
+        {
+            WhenInvalid();
+            ShouldAddFailedCount();
+        }
+
+        [Test]
+        public void account_is_locked()
+        {
+            _failedCounter.CheckAccountIsLocked(DefaultAccountId).ReturnsForAnyArgs(true);
+
+            TestDelegate action = () => _authenticationService.Verify(DefaultAccountId, DefaultPassword, DefaultOtp);
+            Assert.Throws<FailedTooManyTimesException>(action);
+        }
+
+        private void ShouldAddFailedCount()
+        {
+            _failedCounter.ReceivedWithAnyArgs(1).Add(DefaultAccountId);
         }
 
         private void LogShouldContains(string accountId, int failedCount)

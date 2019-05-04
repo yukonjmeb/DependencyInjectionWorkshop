@@ -10,6 +10,6 @@
 
         void Reset(string accountId);
 
-        void CheckAccountIsLocked(string accountId);
+        bool CheckAccountIsLocked(string accountId);
     }
 }
