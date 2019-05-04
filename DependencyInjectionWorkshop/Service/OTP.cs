@@ -3,7 +3,12 @@
     using System;
     using System.Net.Http;
 
-    public class OtpService
+    public interface IOTP
+    {
+        string GetCurrentOTP(string accountId);
+    }
+
+    public class OTP : IOTP
     {
         public string GetCurrentOTP(string accountId)
         {

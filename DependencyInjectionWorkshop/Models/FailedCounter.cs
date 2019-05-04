@@ -5,23 +5,23 @@
 
     using DependencyInjectionWorkshop.Exceptions;
 
-    public class FailedCounter
+    public class FailedCounter : IFailedCounter
     {
-        public HttpResponseMessage AddFailedCount(string accountId)
+        public HttpResponseMessage Add(string accountId)
         {
             var addFailedCountResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/Add", accountId).Result;
             addFailedCountResponse.EnsureSuccessStatusCode();
             return addFailedCountResponse;
         }
 
-        public HttpResponseMessage FailedCount(string accountId)
+        public HttpResponseMessage Get(string accountId)
         {
-            var failedCountResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/GetFailedCount", accountId).Result;
+            var failedCountResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/Get", accountId).Result;
             failedCountResponse.EnsureSuccessStatusCode();
             return failedCountResponse;
         }
 
-        public void ResetFailedCounter(string accountId)
+        public void Reset(string accountId)
         {
             var resetResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/ReSet", accountId).Result;
             resetResponse.EnsureSuccessStatusCode();

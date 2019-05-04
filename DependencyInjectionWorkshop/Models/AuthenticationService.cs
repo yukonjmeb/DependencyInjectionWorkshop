@@ -6,57 +6,56 @@
     public class AuthenticationService
     {
         private readonly IProfile _profile;
-        private readonly FailedCounter _failedCounter;
-        private readonly SHA256Adapter _sha256Adapter;
-        private readonly OtpService _otpService;
-        private readonly NLogAdapter _nLogAdapter;
-        private readonly SlackAdapter _slackAdapter;
+        private readonly IFailedCounter _failedCounter;
+        private readonly IHash _hash;
+        private readonly IOTP _otp;
+        private readonly ILogger _logger;
+        private readonly INotification _notification;
 
-        public AuthenticationService(IProfile profile, FailedCounter failedCounter, SHA256Adapter sha256Adapter, OtpService otpService, NLogAdapter nLogAdapter, SlackAdapter slackAdapter)
+        public AuthenticationService(IProfile profile, IFailedCounter failedCounter, IHash hash, IOTP otp, ILogger logger, INotification notification)
         {
             _profile = profile;
             _failedCounter = failedCounter;
-            _sha256Adapter = sha256Adapter;
-            _otpService = otpService;
-            _nLogAdapter = nLogAdapter;
-            _slackAdapter = slackAdapter;
+            _hash = hash;
+            _otp = otp;
+            _logger = logger;
+            _notification = notification;
         }
 
         public AuthenticationService()
         {
             _profile = new Profile();
             _failedCounter = new FailedCounter();
-            _sha256Adapter = new SHA256Adapter();
-            _otpService = new OtpService();
-            _nLogAdapter = new NLogAdapter();
-            _slackAdapter = new SlackAdapter();
+            _hash = new Hash();
+            _otp = new OTP();
+            _logger = new Logger();
+            _notification = new Notification();
         }
 
         public bool Verify(string accountId, string password, string otp)
         {
-            var failedCounter = _failedCounter;
-            failedCounter.CheckAccountIsLocked(accountId);
+            _failedCounter.CheckAccountIsLocked(accountId);
 
             var passwordFromDB = _profile.GetPassword(accountId);
 
-            var hashPassword = _sha256Adapter.GetHashPassword(password);
+            var hashPassword = _hash.GetHash(password);
 
-            var currentOTP = _otpService.GetCurrentOTP(accountId);
+            var currentOTP = _otp.GetCurrentOTP(accountId);
 
             if (passwordFromDB == hashPassword && currentOTP == otp)
             {
-                failedCounter.ResetFailedCounter(accountId);
+                _failedCounter.Reset(accountId);
                 return true;
             }
             else
             {
-                failedCounter.AddFailedCount(accountId);
+                _failedCounter.Add(accountId);
 
-                var failedCountResponse = failedCounter.FailedCount(accountId);
+                var failedCountResponse = _failedCounter.Get(accountId);
 
-                _nLogAdapter.LogFailedCount(accountId, failedCountResponse);
+                _logger.Info(accountId, failedCountResponse);
 
-                _slackAdapter.NotifyAuthFailed();
+                _notification.SlackAdapter();
 
                 return false;
             }
