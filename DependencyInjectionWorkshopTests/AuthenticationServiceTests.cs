@@ -13,6 +13,16 @@
     [TestFixture]
     public class AuthenticationServiceTests
     {
+        private const string DefaultAccountId = "joey";
+
+        private const string DefaultHashedPassword = "my hashed password";
+
+        private const string DefaultOtp = "123456";
+
+        private const string DefaultPassword = "pw";
+
+        private const int DefaultFailedCount = 91;
+
         private IProfile _profile;
 
         private IOtp _otp;
@@ -26,16 +36,6 @@
         private ILogger _logger;
 
         private IAuthentication _authentication;
-
-        private const string DefaultAccountId = "joey";
-
-        private const string DefaultHashedPassword = "my hashed password";
-
-        private const string DefaultOtp = "123456";
-
-        private const string DefaultPassword = "pw";
-
-        private const int DefaultFailedCount = 91;
 
         [SetUp]
         public void Setup()
@@ -98,8 +98,7 @@
             GivenHash(DefaultPassword, DefaultHashedPassword);
             GivenOtp(DefaultAccountId, DefaultOtp);
 
-            var isValid = WhenVerify(DefaultAccountId, DefaultPassword, DefaultOtp);
-            return isValid;
+            return WhenVerify(DefaultAccountId, DefaultPassword, DefaultOtp);
         }
 
         private bool WhenInvalid()
@@ -128,11 +127,6 @@
             ShouldResetFailedCounter();
         }
 
-        private void ShouldResetFailedCounter()
-        {
-            _failedCounter.Received(1).Reset(Arg.Any<string>());
-        }
-
         [Test]
         public void add_failed_count_when_invalid()
         {
@@ -149,6 +143,11 @@
             Assert.Throws<FailedTooManyTimesException>(action);
         }
 
+        private void ShouldResetFailedCounter()
+        {
+            _failedCounter.Received(1).Reset(Arg.Any<string>());
+        }
+
         private void ShouldAddFailedCount()
         {
             _failedCounter.ReceivedWithAnyArgs(1).Add(DefaultAccountId);
@@ -162,16 +161,6 @@
         private void GivenFailedCount(int failedCount)
         {
             _failedCounter.Get(DefaultAccountId).ReturnsForAnyArgs(failedCount);
-        }
-
-        private static void ShouldBeInvalid(bool isValid)
-        {
-            Assert.IsFalse(isValid);
-        }
-
-        private static void ShouldBeValid(bool isValid)
-        {
-            Assert.IsTrue(isValid);
         }
 
         private bool WhenVerify(string accountId, string password, string otp)
@@ -192,6 +181,16 @@
         private void GivenOtp(string accountId, string otp)
         {
             _otp.GetCurrentOtp(accountId).ReturnsForAnyArgs(otp);
+        }
+
+        private static void ShouldBeInvalid(bool isValid)
+        {
+            Assert.IsFalse(isValid);
+        }
+
+        private static void ShouldBeValid(bool isValid)
+        {
+            Assert.IsTrue(isValid);
         }
     }
 }
