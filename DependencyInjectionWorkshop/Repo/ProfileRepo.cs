@@ -1,4 +1,4 @@
-﻿namespace DependencyInjectionWorkshop.Models
+﻿namespace DependencyInjectionWorkshop.Repo
 {
     using System.Data;
     using System.Data.SqlClient;

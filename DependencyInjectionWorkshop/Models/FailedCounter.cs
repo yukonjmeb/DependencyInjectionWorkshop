@@ -3,6 +3,8 @@
     using System;
     using System.Net.Http;
 
+    using DependencyInjectionWorkshop.Exceptions;
+
     public class FailedCounter
     {
         public HttpResponseMessage AddFailedCount(string accountId)

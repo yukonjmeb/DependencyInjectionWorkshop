@@ -1,7 +1,6 @@
 ﻿namespace DependencyInjectionWorkshop.Models
 {
-    using System;
-
+    using DependencyInjectionWorkshop.Repo;
     using DependencyInjectionWorkshop.Service;
 
     public class AuthenticationService
@@ -40,13 +39,6 @@
 
                 return false;
             }
-        }
-    }
-
-    public class FailedTooManyTimesException : Exception
-    {
-        public FailedTooManyTimesException()
-        {
         }
     }
 }
