@@ -19,7 +19,7 @@
             var isLockedResponse = httpClient.PostAsJsonAsync("api/failedCounter/IsLocked", accountId).Result;
             isLockedResponse.EnsureSuccessStatusCode();
 
-            if (!isLockedResponse.Content.ReadAsAsync<bool>().Result)
+            if (isLockedResponse.Content.ReadAsAsync<bool>().Result)
             {
                 throw new FailedTooManyTimesException();
             }
