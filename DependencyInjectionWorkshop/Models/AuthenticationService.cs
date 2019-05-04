@@ -15,6 +15,9 @@
     {
         public bool Verify(string accountId, string password, string otp)
         {
+            var httpClient = new HttpClient() { BaseAddress = new Uri("http://joey.com/") };
+            var isLockedResponse = httpClient.PostAsJsonAsync("api/failedCounter/IsLocked", accountId).Result;
+            isLockedResponse.EnsureSuccessStatusCode();
             var DBPassword = string.Empty;
             var CurrentOTP = string.Empty;
 
@@ -34,7 +37,6 @@
 
             var HashPassword = hash.ToString();
 
-            var httpClient = new HttpClient() { BaseAddress = new Uri("http://joey.com/") };
             var response = httpClient.PostAsJsonAsync("api/otps", accountId).Result;
             if (response.IsSuccessStatusCode)
             {
@@ -47,10 +49,14 @@
 
             if (DBPassword == HashPassword && CurrentOTP == otp)
             {
+                var resetResponse = httpClient.PostAsJsonAsync("api/failedCounter/ReSet", accountId).Result;
+                resetResponse.EnsureSuccessStatusCode();
                 return true;
             }
             else
             {
+                var addFailedCountResponse = httpClient.PostAsJsonAsync("api/failedCounter/ReSet", accountId).Result;
+                addFailedCountResponse.EnsureSuccessStatusCode();
                 var slackClient = new SlackClient("my api token");
                 slackClient.PostMessage(slackResponse => { }, "my channel", "my message", "my bot name");
 
