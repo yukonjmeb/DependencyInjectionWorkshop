@@ -1,25 +1,16 @@
 ﻿namespace DependencyInjectionWorkshop.Models
 {
     using System;
-    using System.Data;
-    using System.Data.SqlClient;
-    using System.Linq;
-    using System.Net.Http;
 
-    using Dapper;
+    using DependencyInjectionWorkshop.Service;
 
     public class AuthenticationService
     {
         private readonly ProfileRepo _profileRepo = new ProfileRepo();
-
         private readonly SHA256Adapter _sha256Adapter = new SHA256Adapter();
-
         private readonly OtpService _otpService = new OtpService();
-
         private readonly FailedCounter _failedCounter = new FailedCounter();
-
         private readonly NLogAdapter _nLogAdapter = new NLogAdapter();
-
         private readonly SlackAdapter _slackAdapter = new SlackAdapter();
 
         public bool Verify(string accountId, string password, string otp)
@@ -30,9 +21,9 @@
 
             var hashPassword = _sha256Adapter.GetHashPassword(password);
 
-            var CurrentOTP = _otpService.GetCurrentOtp(accountId);
+            var currentOTP = _otpService.GetCurrentOTP(accountId);
 
-            if (passwordFromDB == hashPassword && CurrentOTP == otp)
+            if (passwordFromDB == hashPassword && currentOTP == otp)
             {
                 _failedCounter.ResetFailedCounter(accountId);
                 return true;
