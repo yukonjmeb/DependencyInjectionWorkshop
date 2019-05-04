@@ -24,7 +24,7 @@
 
         public bool Verify(string accountId, string password, string otp)
         {
-            CheckAccountIsLocked(accountId);
+            _failedCounter.CheckAccountIsLocked(accountId);
 
             var passwordFromDB = _profileRepo.GetPasswordFromDB(accountId);
 
@@ -34,44 +34,20 @@
 
             if (passwordFromDB == hashPassword && CurrentOTP == otp)
             {
-                ResetFailedCounter(accountId);
+                _failedCounter.ResetFailedCounter(accountId);
                 return true;
             }
             else
             {
                 _failedCounter.AddFailedCount(accountId);
 
-                var failedCountResponse = FailedCount(accountId);
+                var failedCountResponse = _failedCounter.FailedCount(accountId);
 
                 _nLogAdapter.LogFailedCount(accountId, failedCountResponse);
 
                 _slackAdapter.NotifyAuthFailed();
 
                 return false;
-            }
-        }
-
-        private static HttpResponseMessage FailedCount(string accountId)
-        {
-            var failedCountResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/GetFailedCount", accountId).Result;
-            failedCountResponse.EnsureSuccessStatusCode();
-            return failedCountResponse;
-        }
-
-        private static void ResetFailedCounter(string accountId)
-        {
-            var resetResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/ReSet", accountId).Result;
-            resetResponse.EnsureSuccessStatusCode();
-        }
-
-        private static void CheckAccountIsLocked(string accountId)
-        {
-            var isLockedResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/IsLocked", accountId).Result;
-            isLockedResponse.EnsureSuccessStatusCode();
-
-            if (isLockedResponse.Content.ReadAsAsync<bool>().Result)
-            {
-                throw new FailedTooManyTimesException();
             }
         }
     }
