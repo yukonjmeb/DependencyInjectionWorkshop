@@ -2,11 +2,11 @@
 {
     using DependencyInjectionWorkshop.Models;
 
-    public class NotificationBaseDecorator : AuthenticationBaseDecorator 
+    public class NotificationDecorator : AuthenticationBaseDecorator 
     {
         private readonly INotification _notification;
 
-        public NotificationBaseDecorator(IAuthentication authentication, INotification notification)
+        public NotificationDecorator(IAuthentication authentication, INotification notification)
             : base(authentication)
         {
             _notification = notification;

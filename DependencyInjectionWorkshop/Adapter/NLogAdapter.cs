@@ -1,5 +1,6 @@
 ﻿namespace DependencyInjectionWorkshop.Models
 {
+    using System;
     using System.Net.Http;
 
     public interface ILogger
@@ -9,10 +10,18 @@
 
     public class NLogAdapter : ILogger
     {
-        public void Info(string message)
+        public virtual void Info(string message)
         {
             var logger = NLog.LogManager.GetCurrentClassLogger();
             logger.Info(message);
+        }
+    }
+
+    public class ConsoleAdapter : NLogAdapter
+    {
+        public override void Info(string message)
+        {
+            Console.WriteLine(message);
         }
     }
 }

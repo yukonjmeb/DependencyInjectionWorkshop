@@ -2,7 +2,7 @@
 {
     using DependencyInjectionWorkshop.Models;
 
-    public class ApiUserDecorator : AuthenticationBaseDecorator
+    public class ApiUserDecorator : AuthenticationBaseDecorator 
     {
         private readonly IApiUserQuota _apiUserQuota;
 
