@@ -10,6 +10,8 @@
         private readonly IHash _hash;
         private readonly IOtp _otp;
 
+        private bool isVerify;
+
         public AuthenticationService(IProfile profile, IHash hash, IOtp otp)
         {
             _profile = profile;
@@ -25,7 +27,9 @@
 
             var currentOtp = _otp.GetCurrentOtp(accountId);
 
-            return passwordFromDB == hashPassword && currentOtp == otp;
+            isVerify = passwordFromDB == hashPassword && currentOtp == otp;
+
+            return isVerify;
         }
     }
 }

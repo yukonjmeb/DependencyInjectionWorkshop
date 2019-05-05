@@ -49,7 +49,7 @@
 
             var authenticationService = new AuthenticationService(_profile, _hash, _otp);
 
-            var notificationDecorator = new NotificationDecorator(authenticationService, _notification);
+            var notificationDecorator = new NotificationBaseDecorator(authenticationService, _notification);
             var failedCounterDecorator = new FailedCounterDecorator(notificationDecorator, _failedCounter);
             var logDecorator = new LogDecorator(failedCounterDecorator, _logger, _failedCounter);
 

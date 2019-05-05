@@ -2,15 +2,14 @@
 {
     using DependencyInjectionWorkshop.Models;
 
-    public class LogDecorator : IAuthentication
+    public class LogDecorator : AuthenticationBaseDecorator
     {
-        private readonly IAuthentication _authentication;
         private readonly ILogger _logger;
         private readonly IFailedCounter _failedCounter;
 
         public LogDecorator(IAuthentication authentication, ILogger logger, IFailedCounter failedCounter)
+            : base(authentication)
         {
-            _authentication = authentication;
             _logger = logger;
             _failedCounter = failedCounter;
         }
@@ -21,9 +20,9 @@
             _logger.Info($"accountId:{accountId} failed times:{failedCount}");
         }
 
-        public bool Verify(string accountId, string password, string otp)
+        public override bool Verify(string accountId, string password, string otp)
         {
-            var isValid = _authentication.Verify(accountId, password, otp);
+            var isValid = base.Verify(accountId, password, otp);
             if (!isValid)
             {
                 LogVerify(accountId);

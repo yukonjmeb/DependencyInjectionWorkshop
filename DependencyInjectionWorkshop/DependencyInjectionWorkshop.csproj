@@ -75,6 +75,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Decorator\ApiUserDecorator.cs" />
+    <Compile Include="Decorator\AuthenticationBaseDecorator.cs" />
     <Compile Include="Decorator\FailedCounterDecorator.cs" />
     <Compile Include="Decorator\LogDecorator.cs" />
     <Compile Include="Decorator\NotificationDecorator.cs" />
@@ -84,6 +86,7 @@
     <Compile Include="Adapter\NLogAdapter.cs" />
     <Compile Include="Adapter\Hash.cs" />
     <Compile Include="Adapter\SlackAdapter.cs" />
+    <Compile Include="Models\IApiUserQuota.cs" />
     <Compile Include="Models\IAuthentication.cs" />
     <Compile Include="Models\IFailedCounter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
